@@ -17,6 +17,7 @@ module.exports = {
     author: `@ocben1`,
   },
   plugins: [
+    `gatsby-plugin-mdx-embed`,
     {
       resolve: `@lekoarts/gatsby-theme-minimal-blog`,
       // See the theme's README for all available options
