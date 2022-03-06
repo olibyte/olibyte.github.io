@@ -7,11 +7,11 @@ module.exports = {
     // You can overwrite values here that are used for the SEO component
     // You can also add new values here to query them like usual
     // See all options: https://github.com/LekoArts/gatsby-themes/blob/main/themes/gatsby-theme-minimal-blog/gatsby-config.js
-    siteTitle: `Dev Blog`,
-    siteTitleAlt: `Dev Blog`,
-    siteHeadline: `Dev Blog - Oliver Bennett`,
+    siteTitle: `Oliver Bennett's Dev Blog`,
+    siteTitleAlt: `Oliver Bennett's Dev Blog`,
+    siteHeadline: `Oliver Bennett's Dev Blog`,
     siteUrl: `https://oliverbennett.io`,
-    siteDescription: `Typography driven, feature-rich blogging theme with minimal aesthetics. Includes tags/categories support and extensive features for code blocks such as live preview, line numbers, and line highlighting.`,
+    siteDescription: `Oliver Bennett's Dev Blog.`,
     siteLanguage: `en`,
     siteImage: `/banner.jpg`,
     author: `@ocben1`,
@@ -34,12 +34,16 @@ module.exports = {
         ],
         externalLinks: [
           {
-            name: `LinkedIn`,
-            url: `https://linkedin.com/in/olivercbennett`,
+            name: `Home`,
+            url: `https://ocben1.github.io`,
           },
           {
-            name: `Homepage`,
-            url: `https://ocben1.github.io`,
+            name: `GitHub`,
+            url: `https://github.com/ocben1`
+          },
+          {
+            name: `LinkedIn`,
+            url: `https://linkedin.com/in/olivercbennett`,
           },
         ],
       },
