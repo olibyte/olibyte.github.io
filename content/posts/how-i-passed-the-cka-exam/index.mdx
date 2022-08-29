@@ -16,14 +16,38 @@ tags:
   - cloud native
   - cncf
 ---
-BEFORE THE EXAM:
-Exam restrictions and The PSI platform
-Practice exams: Reps, reps, reps.
-Read the documentation (or at least, the important bits):
-DURING THE EXAM: 
-Set your environment variables: $do, $kgp, $kgn, etc.
-Weighting (know how to pick your battles): My approach...
-Relax, and breathe.
+### BEFORE THE EXAM  
+
+#### Exam restrictions and The PSI platform
+
+#### Practice exams
+Reps, reps, reps.
+#### Read the documentation (or at least, the important bits)
+
+### DURING THE EXAM
+
+#### Set shell variables and aliases
+https://kubernetes.io/docs/reference/kubectl/conventions/
+Note: Linux Foundations tips for CKA and CKAD outline that a few aliases and command line tools have been pre-installed and preconfigured for your convenience. No need to set ```alias k=kubectl``` and Bash autocompletion.
+```
+export do="--dry-run=client -o yaml"
+k run busybox $do > busybox.yaml
+```
+Force delete pods
+```
+export now="--force --grace-period 0"
+k delete pod busybox $now
+```
+Aliases
+```
+alias kgp="kubectl get pods"
+alias kgn="kubectl get nodes"
+```
+
+#### Weighting (know how to pick your battles)
+My approach...
+
+#### Relax, and breathe
 
 
 
