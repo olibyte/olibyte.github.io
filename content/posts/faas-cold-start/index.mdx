@@ -1,0 +1,25 @@
+---
+title: Cold Start in AWS Lambda
+date: 2022-09-14
+tags:
+  - aws
+  - lambda
+  - node.js
+  - go
+  - faas
+  - microservices
+---
+<em>Firstly, it's important to address a concern that is often raised with FaaS, and that
+is the notion of spin-up time. Conceptually, functions are not running at all
+unless they are needed. This means they have to be launched to serve an
+incoming request. Now, for some runtimes, it takes a long time to spin up a new
+version of the runtime—often called a “cold start” time. JVM and .NET runtimes
+suffer a lot from this, so a cold start time for functions using these runtimes can
+often be significant.
+In reality, though, these runtimes rarely cold start. On AWS at least, the runtimes
+are kept “warm,” so that requests that come in are served by already launched
+and running instances. This happens to such an extent that it can be difficult to
+gauge the impact of a “cold start” nowadays due to the optimizations being done
+under the hood by the FaaS providers. Nonetheless, if this is a concern, sticking
+to languages whose runtimes have fast spin-up times (Go, Python, Node, and
+Ruby come to mind) can sidestep this issue effectively.</em>
