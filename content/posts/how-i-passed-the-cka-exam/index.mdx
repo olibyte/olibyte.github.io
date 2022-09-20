@@ -16,24 +16,20 @@ tags:
   - cloud native
   - cncf
 ---
-### DISCLAIMER
-This post will cover how I passed the exam, what to expect, the intangibles, and tips to (hopefully) set you up for success. 
-The real-world application of the tasks you'll encounter is debatable. Just because you've passed the exam does not make you a Kubernetes expert. While you should always be learning and staying curious, the 'real-world' value of this certification (as with Azure, AWS, GCP) is debatable. I took the exam because I love challenges and learning. To quote Sam in his book <em>Building Microservices:</em>
-I want to preface this chapter by saying that I do not consider myself to be an
-expert in the space...I aim simply to be a conscious
-incompetent — in other words, I want to understand what I don't know and be
-aware of my limits. Even as I learn more about this space, I learn that there is
-still more to know.
-### BEFORE THE EXAM  
-
-#### Exam restrictions and The PSI platform
-
 #### Practice exams
-Reps, reps, reps. Grep, grep, grep.
+Reps, reps, reps. Doing a round trip of the killer.sh practice exams and scenarios will set you up for success. The exam simulators are intentionally designed to be far more difficult than the actual exam - if you reach a point where you can complete (and fully grasp) the exam simulator and bonus tasks with time to spare, you should be ready!
 #### Read the documentation (or at least, the important bits)
-
+A colleague of mine mentioned the first thing he did was to read every single page of the documentation back to front 3 times. Everybody absorbs information differently, and in retrospect I wonder how I might have went had I done the same. The goal is not to memorize the information - but should a task pop up that requires you to generate a lengthy snippet or boilerplate, you should know exactly where to navigate. Rolling updates and upgrading clusters should require very little brain-power if you have the correct documentation in front of you. YAML and imperatives for network policies, RBAC and JSONPath can be challenging and may require a lengthy snippet or 'fiddly' imperative. Knowing where to find an example snippets and/or set of commands you can use as a template is vital. At the very least, memorize what is and isn't on the kubectl Cheat Sheet. 
 ### DURING THE EXAM
-
+#### Relax, and breathe
+Things like latency, tunneling and viewport issues will immediately put you at a disadvantage. When tackling a task, ensure you've fully processed the question and have a solid idea of what commands to be run.
+#### Exam restrictions and The PSI platform
+Latency, tunneling and viewport issues with the PSI platform have been widely reported - my understanding is PSI has rectified this, and if you're sitting the exam at a testing centre, this may not apply to you - but just in case...
+1. One active monitor only. If you do have a desktop available to you, consider it. The PSI browser will consume 100% of your viewport, so the GUI for your remote desktop session will be roughly 66% of your monitor by default (of course, collapsing task instructions can give you more screen real-estate temporarily).
+2. You'll be working with a Linux Terminal, so be sure to know the copy and paste commands. YAML formatting issues have been reported when copying/pasting from the docs to the VIM editor.
+3. Basics like copy, paste, delete, undo, write and quit is (technically) good enough - but knowing advanced Vim commands will make your life easier (not to mention make you a decent techy). Linux ```cat``` and ```grep``` is also sufficient, but getting comfortable with Linux and, Vim search and replace commands like ```:%s/old/new/g``` and ```:vim[grep] /pattern/ {`{file}`}``` will make you a pro. This is the cheat sheet I used during my learnings: https://vim.rtorr.com/
+4. You'll be using a Firefox browser, no bookmarks allowed!
+5. Heads up! In addition to the mandatory pre-exam OS/Device Systems Requirements check, upon launching the PSI platform you may be prompted to update the software, and kill background processes (there were a couple of nasty ones that re-spawned even after I jumped out of my task manager). I'd used the PSI bridge for my AWS cert previously, and the first time this happened to me I'd worked up a real headache before my exam had even begun.
 #### Set shell variables and aliases
 https://kubernetes.io/docs/reference/kubectl/conventions/
 Note: Linux Foundations tips for CKA and CKAD outline that a few aliases and command line tools have been pre-installed and preconfigured for your convenience. No need to set ```alias k=kubectl``` and Bash autocompletion.
@@ -51,15 +47,20 @@ Aliases
 alias kgp="kubectl get pods"
 alias kgn="kubectl get nodes"
 ```
-
 #### Weighting (know how to pick your battles)
-The exam is worth 100 points over 120 minutes. If I 
+The exam is worth 100 points over 120 minutes.
 ### My approach:
 1. Do a quick read-through of all questions noting the weighting. There's 100 points up for grabs in 120 minutes. Will this 7% task take more or less than 7-8 minutes?
 2. As you read through, you'll no doubt find a few that you can knock over in a minute or two. I started with these. As a result, I felt confident I'd scored 30-40 points just 20 minutes into the exam.
-3. At this stage, you should be left with those "this may take a while" and "I'm not 100% sure how to tackle this"
- tasks. Prioritise the high-value questions, remaining mindful that you should be looking to earn 1% every minute. 
+3. At this stage, you should be left with those "this may take a while" or "I'm not 100% sure how to tackle this"
+ tasks. Prioritise the high-value questions, staying mindful that earning 1% every minute will get you home comfortably. 
 4. Attempt all questions, and hunt for quick wins. Points can be awarded for partially completing the task. I had a strong start, but with 20 minutes left I found myself with 3 tasks weighted 4-7% each I hadn't touched. After rolling the dice with trial and error (I felt searching docs for the perfect boilerplate may consume too many precious final minutes) - I fumbled over a 4% task for 15 minutes before skipping out of frustration. I put myself in a situation where I had just 2 minutes left to attempt the final question, where I might have been lucky to scrape 1 point out of a possible 7. Upon reflection, I would have preferred to look at all 3, looking for those quick wins. Scoring 50%, 60%, & 70% on these final 3 respectively would have been a far better outcome than my estimated 90%, 10%, 40%.   
-#### Relax, and breathe
-Again, time is your enemy. Things like latency, tunneling and viewport issues will immediately put you at a disadvantage. When tackling a task, ensure you've fully processed the question and have a solid idea of what commands to be run.
 
+### DISCLAIMER
+This post will cover how I passed the exam, what to expect, the intangibles, and tips to (hopefully) set you up for success. 
+The real-world application of the tasks you'll encounter is debatable. Just because you've passed the exam does not make you a Kubernetes expert. While you should always be learning and staying curious, the 'real-world' value of this certification (as with Azure, AWS, GCP) is debatable. I took the exam because I love challenges and learning. To quote Sam in his book <em>Building Microservices:</em>
+I want to preface this chapter by saying that I do not consider myself to be an
+expert in the space...I aim simply to be a conscious
+incompetent — in other words, I want to understand what I don't know and be
+aware of my limits. Even as I learn more about this space, I learn that there is
+still more to know.
