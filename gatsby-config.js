@@ -14,7 +14,7 @@ module.exports = {
     siteDescription: `Oliver Bennett's Dev Blog.`,
     siteLanguage: `en`,
     siteImage: `/banner.jpg`,
-    author: `@ocben1`,
+    author: `@olibyte`,
   },
   plugins: [
     `gatsby-plugin-mdx-embed`,
@@ -35,11 +35,11 @@ module.exports = {
         externalLinks: [
           {
             name: `Home`,
-            url: `https://ocben1.github.io`,
+            url: `https://olibyte.github.io`,
           },
           {
             name: `GitHub`,
-            url: `https://github.com/ocben1`
+            url: `https://github.com/olibyte`
           },
           {
             name: `LinkedIn`,
