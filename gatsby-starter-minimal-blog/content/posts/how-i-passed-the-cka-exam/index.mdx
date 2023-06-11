@@ -1,0 +1,72 @@
+---
+title: How I passed the Certified Kubernetes Administrator (CKA) exam
+date: 2022-08-27
+tags:
+  - kubernetes
+  - k8s
+  - cloud
+  - infrastructure as code
+  - yaml
+  - devops
+  - containers
+  - cka
+  - bash
+  - linux
+  - ubuntu
+  - cloud native
+  - cncf
+---
+TLDR? Skip to the exam gotchas.
+### Before the exam
+#### Starting from scratch?
+If you're new to Kubernetes, strongly consider a learning path:
+- [Kubernetes The Hard Way](https://github.com/kelseyhightower/kubernetes-the-hard-way) - for a long time the go-to tutorial for learning how to bootstrap a Kubernetes cluster. At the time of writing, the tutorial runs Kubernetes v1.21, and the exam is based on v1.24. 
+- Purchasing the **Kubernetes Fundamentals (LFS258)** - you can buy this as the companion course in a CKA bundle (I didn't buy this so can't speak to its content or value for money)
+- [KodeKloud CKA Certification Course](https://kodekloud.com/courses/certified-kubernetes-administrator-cka/) - great buy at $20, and while I glossed over the **20 hours of videos**, the 3 practice exams and lightning lab alone is great prep. *Edit: Looks like it might even be free now...*
+#### Reps, reps, reps
+Candidates who register for the [CKA exam](https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/) will have 2 attempts at an exam simulator provided by Killer Shell. Doing a round trip of the [killer.sh](https://killer.sh) practice exams and scenarios will set you up for success. The simulators are far more difficult than the actual exam - if you reach a point where you can complete (**and fully grasp, not regurgitate**) the exam simulator and bonus tasks with time to spare, you should be ready!
+#### Watch and learn
+I got hooked on [Rawkode](https://www.youtube.com/c/Rawkode) Klustered videos - a series of live streams where teams fix "broken" Kubernetes clusters. Watching some of the pros troubleshoot and problem solve really took my understanding of Kubernetes to the next level. If you're after something a little more targeted, [Alok Kumar](https://www.youtube.com/c/AlokKumar-CloudKeFunde) walks through a number of CKA sample questions and solutions which I found to be quite helpful. 
+#### Read the documentation (or at least, the important bits)
+A colleague of mine read every single page of the documentation cover-to-cover 3 times. Everybody absorbs information differently, and in hindight I wonder how I might have went had I done the same. The goal is not to memorize the information - but should a task pop up that requires you to generate a lengthy snippet or set of commands, knowing where to find nice boilerplate is invaluable. Upgrading kubeadm clusters should require very little brain-power if you have the [correct documentation](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/) in front of you. YAML and imperatives for network policies, RBAC and JSONPath often requires a lengthy snippet or 'fiddly' imperative. Knowing where to find an example snippets and/or set of commands you can use as a template is vital. At the very least, memorize what is and isn't on the kubectl Cheat Sheet. 
+### During the exam
+#### Relax, and breathe
+Things like latency, tunneling and viewport issues will immediately put you at a disadvantage. When tackling a task, ensure you've fully processed the question and have a solid idea of what commands should be run.
+#### Exam gotchas and remote proctoring
+Latency, tunneling and viewport issues with the new proctoring platform PSI Bridge platform have been widely reported - my understanding is PSI has rectified this, but addition to the [important instructions](https://docs.linuxfoundation.org/tc-docs/certification/tips-cka-and-ckad) and [update on proctoring migration](https://training.linuxfoundation.org/blog/update-on-certification-exam-proctoring-migration/), here are some tips:
+1. One active monitor only, and if you have something 15" or higher, use it! The PSI browser consumes 100% of your viewport, so the GUI for your remote desktop session will be roughly 66% of your monitor by default (of course, collapsing task instructions can give you more screen real-estate temporarily).
+2. You'll be working with Linux OS, so be sure to know the copy and paste commands. YAML formatting issues have been reported when copying/pasting from the docs to the VIM editor.
+3. Basics like copy, paste, delete, undo, write and quit are all well and good - but advanced commands will make your life easier (and is an invaluable, transferable industry skill). Linux ```cat``` and ```grep``` is fine, but getting comfortable with search and replace commands like ```:%s/old/new/g``` and ```:vim[grep] /pattern/ {`{file}`}``` will make you a pro.
+4. Inside the VM (nested inside the PSI bridge platform), you'll have a Firefox browser available. This can only be used to review/search [https://helm.sh/](https://helm.sh), [Kubernetes docs](https://kubernetes.io/docs/) and [Kubernetes blog]() and any search results that have a domain matching these.
+5. In addition to the mandatory pre-exam OS/Device Systems Requirements check, upon launching the PSI platform you may be prompted to update the software, and kill background processes (there were a couple of nasty ones that re-spawned even after I jumped out of my task manager). I'd used the PSI bridge for my AWS cert previously, and the first time this happened to me I'd worked up a real headache before my exam had even begun.
+6. Clean your room the day before. Your exam proctor will ask you to pan your camera/device around the room to ensure you're in an [acceptable testing location](https://docs.linuxfoundation.org/tc-docs/certification/tips-cka-and-ckad) there are no posters, bins or clutter. 
+#### Set shell variables and aliases
+The less keystrokes the better! Here are some of the variables and aliases I used as keyboard shortcuts:
+Note: Linux Foundations tips for CKA and CKAD outline that some[conventions](https://kubernetes.io/docs/reference/kubectl/conventions/) such as aliases and command line tools have been pre-installed and preconfigured for your convenience. No need to set ```alias k=kubectl``` and Bash autocompletion.
+```
+# Preview the object that would be sent to your cluster, without really submitting it
+export do="--dry-run=client -o yaml" 
+k run busybox $do > busybox.yaml
+```
+Force delete pods
+```
+export now="--force --grace-period 0"
+k delete pod busybox $now
+```
+Aliases
+```
+alias kgp="kubectl get pods"
+alias kgn="kubectl get nodes"
+```
+#### Weighting (pick your battles)
+The exam is worth 100 points over 120 minutes.
+### My approach:
+1. Do a quick read-through of all questions noting the weighting. There's 100 points up for grabs in 120 minutes. Will this 7% task take more or less than 7-8 minutes?
+2. As you read through, you'll no doubt find a few that you can knock over in a minute or two. I started with these. As a result, I felt confident I'd scored 30-40 points just 20 minutes into the exam.
+3. At this stage, you should be left with those "this may take a while" or "I'm not 100% sure how to tackle this"
+ tasks. Prioritise the high-value questions, staying mindful that earning 1% every minute will get you home comfortably. 
+4. Attempt all questions, and hunt for quick wins. Points can be awarded for partially completing the task. I had a strong start, but with 20 minutes left I found myself with 3 tasks weighted 4-7% each I hadn't touched. After rolling the dice with trial and error (I felt searching docs for the perfect boilerplate may consume too many precious final minutes) - I fumbled over a 4% task for 15 minutes before skipping out of frustration. I put myself in a situation where I had just 2 minutes left to attempt the final question, where I might have been lucky to scrape 1 point out of a possible 7. Upon reflection, I would have preferred to look at all 3, looking for those quick wins. Scoring 50%, 60%, & 70% on these final 3 respectively would have been a far better outcome than my estimated 90%, 10%, 40%.
+### DISCLAIMER
+This post has cover how I passed the exam, what to expect, the intangibles, and tips to (hopefully) set you up for success. 
+The real-world application of the tasks you'll encounter is debatable. IMO, passing the exam does not make you a Kubernetes expert. While you should always be learning and staying curious, the 'real-world' value of all IT certifications is debatable. I took the exam because I love challenges and learning. To quote Sam in his book <em>Building Microservices:</em>
+> I want to preface this chapter by saying that I do not consider myself to be an expert in the space...I aim simply to be a conscious incompetent — in other words, I want to understand what I don't know and be aware of my limits. Even as I learn more about this space, I learn that there is still more to know.
