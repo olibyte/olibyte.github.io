@@ -1,9 +1,9 @@
 /** @jsx jsx */
-import { jsx, Link } from "theme-ui";
-import useSiteMetadata from "@lekoarts/gatsby-theme-minimal-blog/src/hooks/use-site-metadata";
+import { jsx, Link } from "theme-ui"
+import useSiteMetadata from "@lekoarts/gatsby-theme-minimal-blog/src/hooks/use-site-metadata"
 
 const Footer = () => {
-  const { siteTitle } = useSiteMetadata();
+  const { siteTitle } = useSiteMetadata()
 
   return (
     <footer
@@ -11,7 +11,7 @@ const Footer = () => {
         boxSizing: `border-box`,
         display: `flex`,
         justifyContent: `space-between`,
-        // mt: [6],
+        mt: [6],
         color: `secondary`,
         a: {
           variant: `links.secondary`,
@@ -21,10 +21,10 @@ const Footer = () => {
       }}
     >
       <div>
-        &copy; {new Date().getFullYear()} by {siteTitle}. All rights reserved
+        &copy; {new Date().getFullYear()} by {siteTitle}. All rights reserved.
       </div>
     </footer>
-  );
-};
+  )
+}
 
-export default Footer;
+export default Footer
