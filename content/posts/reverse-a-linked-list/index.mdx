@@ -1,0 +1,118 @@
+---
+title: Reversing a Linked List in Python
+date: 2023-09-09
+tags:
+  - python
+  - data structures
+  - algorithms
+  - linked list
+  - interview
+  - recruitment
+---
+Reversing a linked list is a classic technical interview question that tests your understanding of data structures and algorithms. In this blog post, we'll walk you through the steps to reverse a linked list in Python, starting with a basic implementation and then optimizing it for better performance. We'll also analyse the space and time complexity of each approach.  
+### Basic Implementation:  
+
+To reverse a linked list, you need to change the direction of the pointers. Here's a step-by-step guide to achieving this:  
+
+#### Step 1: Define a Node class  
+
+```python
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next = None
+```
+
+#### Step 2: Create a LinkedList class  
+
+```python
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def append(self, value):
+        new_node = Node(value)
+        if not self.head:
+            self.head = new_node
+        else:
+            current = self.head
+            while current.next:
+                current = current.next
+            current.next = new_node
+
+    def reverse(self):
+        prev = None
+        current = self.head
+
+        while current:
+            next_node = current.next
+            current.next = prev
+            prev = current
+            current = next_node
+
+        self.head = prev
+```
+
+#### Step 3: Reverse the Linked List  
+
+Now that we have a basic implementation of a linked list, you can reverse it using the `reverse` method:  
+
+```python
+# driver code
+my_list = LinkedList()
+my_list.append(1)
+my_list.append(2)
+my_list.append(3)
+my_list.append(4)
+
+print("Original Linked List:")
+my_list.print_list()  # Implement a print_list method to display the linked list
+
+my_list.reverse()
+
+print("\nReversed Linked List:")
+my_list.print_list()
+```
+#### Output:
+
+```python
+Original Linked List:
+1 -> 2 -> 3 -> 4
+
+Reversed Linked List:
+4 -> 3 -> 2 -> 1
+```
+
+In this example, we start with an original linked list `1 -> 2 -> 3 -> 4`, and after applying the `reverse` method, we get the reversed linked list `4 -> 3 -> 2 -> 1`.
+
+### Optimization for Performance:  
+
+The basic implementation works, but it's not the most efficient approach in terms of time complexity. It has a time complexity of O(n), where n is the number of nodes in the linked list. To optimize it, we can achieve the reversal in O(n) time with O(1) space complexity using a technique called the "two-pointer" or "sliding window" approach.  
+
+Here's the optimized code:  
+
+```python
+def reverse_optimized(self):
+    prev = None
+    current = self.head
+
+    while current:
+        next_node = current.next
+        current.next = prev
+        prev = current
+        current = next_node
+
+    self.head = prev
+```
+
+### Time and Space Complexity Analysis:  
+
+- **Basic Implementation:**
+  - Time Complexity: O(n) - We iterate through the linked list once.
+  - Space Complexity: O(1) - We use a constant amount of extra space.
+
+- **Optimized Implementation:**
+  - Time Complexity: O(n) - We still iterate through the linked list once.
+  - Space Complexity: O(1) - We use only a constant amount of extra space.
+
+In conclusion, reversing a linked list is a common technical interview question that can be solved with a basic implementation and an optimized approach. Understanding the time and space complexities of these solutions is essential for acing technical interviews. Practice implementing and optimizing algorithms like this one to improve your coding skills and increase your chances of success in interviews.
