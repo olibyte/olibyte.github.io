@@ -132,6 +132,10 @@ const config: GatsbyConfig = {
         ],
       },
     },
+    {
+      resolve: `gatsby-plugin-mdx-embed`
+    },
+
     // You can remove this plugin if you don't need it
     shouldAnalyseBundle && {
       resolve: `gatsby-plugin-webpack-statoscope`,
