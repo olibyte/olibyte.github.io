@@ -39,7 +39,9 @@ class LinkedList:
             while current.next:
                 current = current.next
             current.next = new_node
-
+```
+#### Step 3: Implement Reverse
+```python
     def reverse(self):
         prev = None
         current = self.head
@@ -52,8 +54,7 @@ class LinkedList:
 
         self.head = prev
 ```
-
-#### Step 3: Reverse the Linked List  
+  
 
 Now that we have a basic implementation of a linked list, you can reverse it using the `reverse` method:  
 
