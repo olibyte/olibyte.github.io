@@ -1,0 +1,80 @@
+---
+title: What is Event Driven Architecture?
+date: 2023-08-13
+tags:
+  - aws
+  - sagemaker
+  - solution architecture
+  - event-driven architecture
+  - microservices
+  - machine learning
+  - sns
+  - pub/sub
+  - lambda
+---
+Event-driven architecture (EDA) is a software design paradigm that decouples components by having them communicate with each other by exchanging events. Events are notifications of changes in state or of important occurrences in the system.  
+### In an upcoming project, I'll show you how to build and deploy a fraud detection system that uses ML to identify suspicious transactions and alert the customer and team.
+In an EDA, components are not directly connected to each other. Instead, they communicate by **publishing and subscribing to events**. When a component publishes an event, it is made available to all components that have subscribed to that event.
+
+This decoupling of components makes EDA systems more flexible and scalable. Components can be easily added or removed without affecting the rest of the system. Additionally, EDA systems can handle a high volume of events because they do not have to wait for each other to respond.
+
+### Benefits of Event-Driven Architecture
+
+- Flexibility: easy to adapt to changes because components are not tightly coupled.
+- Scalability: can handle a high volume of events because they do not have to wait for each other to respond.
+- Resilience: more resilient to failures because components can be replaced without affecting the rest of the system.
+- Performance: can be more performant than traditional architectures because they do not have to wait for each other to respond.
+- Observability: easier to monitor and troubleshoot because events provide a history of the system's state.
+
+### Examples of Event-Driven Architecture
+
+- **Real-time streaming applications**: EDA is used to process and analyze streaming data in real time.
+- **IoT applications**: EDA is used to collect and process data from sensors and devices.
+- **Microservices architectures**: EDA is used to decouple microservices and enable them to communicate with each other.
+- **Event-sourcing**: EDA is used to store events in a chronological order, which can be used to reconstruct the state of the system at any point in time.
+
+### Use case: Fraud Detection
+EDA can be used to detect fraud by analyzing financial data to identify patterns that are indicative of fraudulent activity. For example, EDA can be used to identify transactions that are:
+
+- Out of the ordinary for a particular customer
+- Made from a new location or unfamiliar device
+- Made to a suspicious merchant
+- Made in a suspicious way (such as multiple small transactions in a short period of time)
+
+Some **AWS services** that could be used to implement an EDA fraud detection system include:
+#### Sagemaker
+SageMaker can be used to build and deploy machine learning models to detect fraud.
+#### Lambda
+A serverless compute service that can be used to run code in response to events.
+#### EventBridge
+A serverless event bus that can be used to send events between different AWS services.
+#### Simple Notification Service (SNS)
+A pub/sub messaging service that can be used to send alerts to a variety of destinations, including email, SMS, and HTTP endpoints.
+#### Among others...
+- **Rekognition** to identify objects and faces in images and videos, which can be helpful for fraud detection in cases where the fraudster is using a stolen credit card or ID.
+- **Fraud Detector** a managed service that can be used to detect fraud in real time.
+- **Simple Storage Service (S3)** to store the fraud data.
+- **Redshift** to analyze large datasets of fraud data.
+- **Athena** to query the fraud data in Redshift.
+- **QuickSight** to visualize the fraud data.
+- **CloudWatch** to monitor the fraud detection system.
+
+### Publish-subscribe: Alerting the fraud detection team
+The publish-subscribe component can also be used to send alerts to the fraud detection team when a fraudulent transaction is detected. This can be done by publishing an event to the publish-subscribe component when a fraudulent transaction is detected. The fraud detection team can then subscribe to the event and be notified when a fraudulent transaction occurs.
+
+#### On a high-level...
+**Here's how one might use SNS to send an alert to the fraud detection team if our Sagemaker machine learning model predicts a fraudulent transaction**:
+
+1. Create an SNS topic and subscribe the fraud detection team to the topic.
+2. Create a Lambda function that is triggered by the SNS topic. The Lambda function should send an email or SMS message to the fraud detection team.
+3. Configure SageMaker to publish an event to the SNS topic when it predicts a fraudulent transaction.
+
+#### Alternatively, EventBridge...
+could send an alert to the fraud detection team if our SageMaker machine learning model predicts a fraudulent transaction:
+
+1. Create an EventBridge rule that is triggered by the event that SageMaker publishes when it predicts a fraudulent transaction.
+2. Configure the EventBridge rule to send an event to the SNS topic that the fraud detection team is subscribed to.
+
+Event-driven architecture is a powerful architectural pattern that can be used to build flexible, scalable, and resilient applications. If you are looking for a way to build applications that can adapt to change and handle a high volume of events, then EDA is a good option to consider.
+
+### Stay tuned, in [an upcoming post](/build-and-deploy-a-fraud-detection-system) I'll show you how to build and deploy a fraud detection system!
