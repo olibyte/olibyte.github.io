@@ -1,6 +1,6 @@
 ---
 title: Cold Start in AWS Lambda
-date: 2022-09-14
+date: 2021-12-14
 tags:
   - aws
   - lambda
@@ -9,17 +9,51 @@ tags:
   - faas
   - microservices
 ---
-<em>Firstly, it's important to address a concern that is often raised with FaaS, and that
+[https://resume.oliverbennett.net](https://resume.oliverbennett.net)  
+I recently wrote AWS Lambda GET and PUT functions to count website visitors as part of the [Cloud Resume Challenge](https://github.com/olibyte/cloud-resume-challenge). It wasn't long before I learnt about the concept of 'cold starts', and again came across them while reading Sam Newman's book "Building Microservices".  
+> It's important to address a concern that is often raised with FaaS, and that
 is the notion of spin-up time. Conceptually, functions are not running at all
 unless they are needed. This means they have to be launched to serve an
 incoming request. Now, for some runtimes, it takes a long time to spin up a new
 version of the runtime—often called a “cold start” time. JVM and .NET runtimes
 suffer a lot from this, so a cold start time for functions using these runtimes can
-often be significant.
+often be significant.  
 In reality, though, these runtimes rarely cold start. On AWS at least, the runtimes
 are kept “warm,” so that requests that come in are served by already launched
 and running instances. This happens to such an extent that it can be difficult to
 gauge the impact of a “cold start” nowadays due to the optimizations being done
 under the hood by the FaaS providers. Nonetheless, if this is a concern, sticking
 to languages whose runtimes have fast spin-up times (Go, Python, Node, and
-Ruby come to mind) can sidestep this issue effectively.</em>
+Ruby come to mind) can sidestep this issue effectively. - Sam Newman (Building Microservices)  
+
+### What Are Cold Starts?
+
+Cold starts in AWS Lambda refer to the delay experienced when a new instance of a function is initialized for the first time or after a significant period of inactivity. During a cold start, Lambda provisions resources such as CPU, memory, and networking for the function, loads the runtime environment, and prepares it to execute your code. This initialization process can result in increased invocation times compared to "warm" or pre-initialized function instances.
+
+### Why Do Cold Starts Occur?
+
+Cold starts happen for several reasons, and understanding these factors is crucial to addressing and mitigating their impact:
+
+1. Resource Provisioning: AWS Lambda dynamically allocates resources based on the configured function settings, such as memory allocation and concurrency. When a new instance is needed, it takes time to allocate these resources.
+
+2. Initialization Overhead: Lambda functions run within a containerized environment. When a container is created or reused for a new invocation, there's an overhead associated with loading the runtime, dependencies, and your code.
+
+3. Scaling and Concurrency: Lambda scales your functions automatically based on incoming traffic. During high traffic periods, new function instances might be created more frequently, leading to more cold starts.
+
+4. Inactivity Timeout: If a Lambda function is inactive for a certain period, AWS may deallocate the resources to save costs. Subsequent invocations after such deallocation will experience cold starts.
+
+### Mitigating Cold Starts
+
+While you can't completely eliminate cold starts in AWS Lambda, you can take steps to minimize their impact:
+
+1. Provision Adequate Memory: Increasing the memory allocated to your function can also increase the CPU allocated, which can reduce initialization time.
+
+2. Use Warmup Strategies: Implement a warmup mechanism by regularly invoking a dummy function or using AWS services like Amazon CloudWatch Events to keep your function "warm" and reduce cold start times.
+
+3. Optimize Code and Dependencies: Minimize the size of your deployment package by removing unnecessary dependencies or using AWS Lambda Layers to separate large libraries from your function code.
+
+4. Leverage Provisioned Concurrency: AWS Lambda offers Provisioned Concurrency, which allows you to pre-warm function instances to reduce cold start latency.
+
+5. Adjust Timeout Settings: If possible, extend the timeout duration for your function to accommodate longer cold start times.
+
+Cold starts are an inherent aspect of serverless computing in AWS Lambda. While they can impact the performance of your functions, understanding why they occur and implementing mitigation strategies can help you deliver faster and more responsive serverless applications. By optimizing your code, leveraging AWS services, and configuring Lambda functions wisely, you can strike a balance between cost efficiency and performance in your serverless architecture.
