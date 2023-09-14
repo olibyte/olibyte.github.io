@@ -1,0 +1,197 @@
+---
+title: Introduction to gRPC
+date: 2023-05-09
+tags:
+ - gRPC
+ - remote procedure call
+ - microservices
+ - distributed systems
+ - protobuf
+ - protocol buffers
+ - http/2
+---
+https://www.youtube.com/watch?v=RR0YTEEMLFg&t=1377s
+
+### What is gRPC?
+
+gRPC stands for "Google Remote Procedure Call." It's an open-source framework that facilitates communication between applications and services, allowing them to make requests and receive responses as if they were calling local procedures or methods. What sets gRPC apart from other communication protocols is its use of Protocol Buffers (protobufs) for defining service contracts and messages, as well as its support for multiple programming languages.
+
+### Key Features of gRPC
+
+gRPC uses HTTP/2 as its transport protocol, which provides benefits like multiplexing, header compression, and asynchronous communication. This leads to reduced latency and bandwidth usage compared to traditional REST APIs.
+
+With Protocol Buffers, you can define your service methods and data structures in a language-agnostic Interface Definition Language (IDL). gRPC then generates client and server code for multiple programming languages based on these definitions, making it easy to maintain consistent APIs across different platforms.
+
+gRPC supports both unary (single request, single response) and streaming communication. Bidirectional streaming allows for real-time, interactive applications where both the client and server can send and receive messages asynchronously.
+
+gRPC is extensible and allows for the integration of authentication, load balancing, and other custom features. This flexibility makes it suitable for various use cases and environments.
+
+### Use Cases for gRPC
+
+gRPC is well-suited for building **microservices**-based architectures, where services need to communicate efficiently and reliably. Its support for streaming and multiplexing is especially beneficial in these scenarios.
+
+Applications requiring **real-time** updates or bidirectional communication, such as chat applications, online gaming, and collaborative tools, can benefit from gRPC's streaming capabilities.
+
+When your organization uses **polyglot enviornments** and a variety of programming languages, gRPC ensures that services written in different languages can interact effortlessly.
+
+In use cases where low-latency communication is critical, such as financial systems or IoT applications, gRPC's **high-performance APIs** makes it a preferred choice.
+
+Use case: E-commerce system
+
+Once you're done with the [quick start](https://grpc.io/docs/languages/python/quickstart/) here's a basic python tutorial on how to create a simple e-commerce system that includes multiple microservices for managing products, orders, and user accounts. These services will communicate using gRPC.
+
+**1. Define Protobuf Service Definitions:**
+
+First, we'll define the service contracts for our microservices using Protocol Buffers. Let's create three services: ProductService, OrderService, and UserService.
+
+**product.proto**
+```protobuf
+syntax = "proto3";
+
+package ecommerce;
+
+service ProductService {
+  rpc GetProductInfo (ProductRequest) returns (ProductInfo);
+}
+
+message ProductRequest {
+  string product_id = 1;
+}
+
+message ProductInfo {
+  string name = 1;
+  string description = 2;
+  double price = 3;
+}
+```
+
+**order.proto**
+```protobuf
+syntax = "proto3";
+
+package ecommerce;
+
+service OrderService {
+  rpc PlaceOrder (OrderRequest) returns (OrderResponse);
+}
+
+message OrderRequest {
+  string user_id = 1;
+  repeated ProductInfo products = 2;
+}
+
+message OrderResponse {
+  string order_id = 1;
+  double total_price = 2;
+}
+```
+
+**user.proto**
+```protobuf
+syntax = "proto3";
+
+package ecommerce;
+
+service UserService {
+  rpc GetUserProfile (UserRequest) returns (UserProfile);
+}
+
+message UserRequest {
+  string user_id = 1;
+}
+
+message UserProfile {
+  string username = 1;
+  string email = 2;
+}
+```
+
+**2. Generate Code:**
+
+Using the Protocol Buffers definitions, you can generate client and server code in various programming languages. Here, we'll use Python for simplicity.
+
+```bash
+# Generate Python code
+protoc -I=. --python_out=. product.proto order.proto user.proto
+```
+
+**3. Implement gRPC Services:**
+
+Now, let's implement the gRPC services for products, orders, and users in Python.
+
+```python
+# product_service.py
+import grpc
+from concurrent import futures
+import product_pb2
+import product_pb2_grpc
+
+class ProductServicer(product_pb2_grpc.ProductServiceServicer):
+    def GetProductInfo(self, request, context):
+        # Your implementation to fetch product info
+        product_info = fetch_product_info(request.product_id)
+        return product_pb2.ProductInfo(name=product_info['name'], description=product_info['description'], price=product_info['price'])
+
+# Similar implementations for OrderServicer and UserServicer
+```
+
+**4. Create gRPC Server:**
+
+Create a gRPC server and register your services.
+
+```python
+# server.py
+import grpc
+import product_pb2_grpc
+import order_pb2_grpc
+import user_pb2_grpc
+from concurrent import futures
+
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    product_pb2_grpc.add_ProductServiceServicer_to_server(ProductServicer(), server)
+    order_pb2_grpc.add_OrderServiceServicer_to_server(OrderServicer(), server)
+    user_pb2_grpc.add_UserServiceServicer_to_server(UserServicer(), server)
+    server.add_insecure_port('[::]:50051')
+    server.start()
+    server.wait_for_termination()
+
+if __name__ == '__main__':
+    serve()
+```
+
+**5. Create gRPC Clients:**
+
+Now, let's create gRPC clients in Python to interact with these services.
+
+```python
+# client.py
+import grpc
+import product_pb2
+import order_pb2
+import user_pb2
+import product_pb2_grpc
+import order_pb2_grpc
+import user_pb2_grpc
+
+def get_product_info(product_id):
+    channel = grpc.insecure_channel('localhost:50051')
+    stub = product_pb2_grpc.ProductServiceStub(channel)
+    response = stub.GetProductInfo(product_pb2.ProductRequest(product_id=product_id))
+    return response
+
+# Similar client functions for order and user services
+```
+
+**6. Using the Services:**
+
+In your enterprise application, you can now use these gRPC clients to make requests to the respective services, allowing for efficient communication between microservices.
+
+```python
+# Using the gRPC clients
+product_info = get_product_info('123')
+user_profile = get_user_profile('456')
+
+# Create an order with the retrieved product and user information
+order = create_order(user_profile, [product_info])
+```
