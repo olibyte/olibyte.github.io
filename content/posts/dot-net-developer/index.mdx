@@ -1,0 +1,102 @@
+---
+title: Now Hiring .NET Developer
+date: 2021-09-26
+tags:
+ - .NET
+ - C#
+ - ASP.NET
+ - WinForms
+ - Xamarin
+---
+So many job advertisements with the headline "Now Hiring: .NET Developer". Unsurprisingly, they all have the same thing in common: "Required skills: Experience with .NET framework". Surprisingly, a **lot** of them tell you almost nothing else. So what is .NET? Without applying for the role, how do you know what the organization is working on, or if you're a good fit?
+
+## What is a .NET Developer?
+
+A .NET developer is a software engineer who specializes in building applications using the Microsoft .NET framework. The .NET framework is a powerful and versatile platform that allows developers to create a wide range of applications, from desktop applications and web applications to mobile apps and cloud-based services.
+
+.NET developers leverage various programming languages like C#, F#, and VB.NET to create software solutions that meet specific business or user needs. They work with a comprehensive set of libraries and tools provided by Microsoft to streamline the development process and ensure the security, performance, and reliability of their applications.
+
+## Exploring the .NET Ecosystem
+
+The .NET ecosystem is vast, encompassing a variety of technologies and platforms. .NET developers could find themselves working on:
+
+**ASP.NET for Web Development**
+
+[**ASP.NET**](https://dotnet.microsoft.com/en-us/apps/aspnet) is a popular framework within the .NET ecosystem for building **web applications**. Let's take a look at a simple C# code snippet that demonstrates how to create a basic web application using ASP.NET:
+
+```csharp
+using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace MyWebApp
+{
+    public class Startup
+    {
+        public void Configure(IApplicationBuilder app)
+        {
+            app.Run(async (context) =>
+            {
+                await context.Response.WriteAsync("Hello, World!");
+            });
+        }
+    }
+}
+```
+
+**WinForms for Desktop Applications**
+
+For developing **Windows desktop applications**, .NET developers often turn to [**Windows Forms** or **WinForms**](https://learn.microsoft.com/en-us/dotnet/desktop/winforms/). Here's a simple example of a WinForms application in C#:
+
+```csharp
+using System;
+using System.Windows.Forms;
+
+public class MyForm : Form
+{
+    public MyForm()
+    {
+        Button myButton = new Button();
+        myButton.Text = "Click Me!";
+        myButton.Click += (sender, e) => MessageBox.Show("Button clicked!");
+
+        Controls.Add(myButton);
+    }
+
+    [STAThread]
+    public static void Main()
+    {
+        Application.EnableVisualStyles();
+        Application.Run(new MyForm());
+    }
+}
+```
+
+**Xamarin for Cross-Platform Mobile Apps**
+
+[**Xamarin**](https://dotnet.microsoft.com/en-us/apps/xamarin) allows .NET developers to create **cross-platform mobile apps** using C#. Here's a snippet showcasing a Xamarin.Forms button:
+
+```csharp
+using Xamarin.Forms;
+
+public class MainPage : ContentPage
+{
+    public MainPage()
+    {
+        Button myButton = new Button
+        {
+            Text = "Click Me!"
+        };
+
+        myButton.Clicked += (sender, e) => DisplayAlert("Button Clicked", "Hello, Xamarin!", "OK");
+
+        Content = new StackLayout
+        {
+            Children = { myButton }
+        };
+    }
+}
+```
+**Are you a .NET developer?** Leave a comment below.
