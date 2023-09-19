@@ -1,0 +1,46 @@
+---
+title: Facebook Memcached to Netflix EVCache
+date: 2022-03-01
+tags:
+ - memached
+ - memcache
+ - evcache
+ - aws
+ - distributed systems
+ - cloud
+ - caching
+ - meta
+ - netflix
+---
+<iframe width="560" height="315" src="https://www.youtube.com/embed/UH7wkvcf0ys?si=dnH1tbsqmctIKdbT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+In 2008 Facebook witnessed not only Mark Zuckerberg's cringe-worthy 60 minutes interview, but a significant turning point in its history. Facebook was experiencing explosive growth. With millions of users joining the platform every month, the demand for fast and efficient data access was paramount. Traditional methods of database queries were no longer sufficient to keep up with the rapidly increasing user base and data volume.
+
+Facebook had begun leveraging Memcached, an open-source, high-performance, distributed memory caching system. Developed by Brad Fitzpatrick in 2003, Memcached had already gained popularity among web giants like LiveJournal and Wikipedia.
+
+Memcached essentially acted as a caching layer between Facebook's web servers and its database. It stored frequently accessed data in memory, eliminating the need to repeatedly query the database for the same information. This not only reduced the load on the database servers but also significantly improved response times for user requests.
+
+Memcached allowed them to scale horizontally - adding more caching servers as needed, ensuring that the system could handle the ever-increasing traffic.
+
+#### Memcached Today
+
+Memcached arguably laid the foundation for the development and adoption of other cutting-edge technologies and architectures:
+ - [**Redis**](https://redis.io/) a highly versatile, open-source, in-memory data store that is often used for caching. It offers not only caching capabilities but also supports data structures, pub/sub messaging, and more.
+ - [**Apache Kafka**](https://kafka.apache.org/), a distributed streaming platform that can be used for caching, especially in scenarios where real-time data processing and stream processing are required.
+ - [**Hazelcast**](https://hazelcast.com/), an open-source, in-memory data grid platform that offers distributed caching capabilities. It can be used for both caching and data distribution.
+ - [**Couchbase**](https://www.couchbase.com/), a NoSQL database that includes a caching layer. It's suitable for applications that require both caching and database capabilities.
+#### Use case: EVCache and Netflix
+[**EV Cache**](https://netflix.github.io/EVCache/) stands for **E**phemeral **V**olatile mem**Cache** - a memcached & spymemcached based caching solution that is mainly used for AWS EC2 infrastructure for caching frequently used data.  
+
+ - Ephemeral : It is intended to store transient data that can disappear as specified by its TTL (Time To Live)
+ - Volatile : In-Memory key-value store where data (strings, objects) can change
+ - Cache : Uses memcached & in some cases backed by RocksDB
+Based on memcached, it is a Tier-0 system at Netflix with its footprint across ~18,000 servers holding ~14 petabytes of data (at the time of writing). EVCache is comprised of thousands of nodes in production and hundreds of clusters all of which must routinely scale up due to the increasing growth of members.
+Just like Facebook back in the day, it serves multiple use cases from signup, personalization, searching, playback, and more. 
+Check out the [**EVCache**](https://github.com/Netflix/EVCache) & [**memached**](https://github.com/memcached/memcached) repos.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/m4_7W4XzRgk?si=eFzxUxiOL_-ajaQG" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+#### Read more about EVCache
+[Evolution of Application Data Caching: From RAM to SSD](https://netflixtechblog.com/evolution-of-application-data-caching-from-ram-to-ssd-a33d6fa7a690)  
+[Cache warming: Agility for a stateful service](https://netflixtechblog.com/cache-warming-agility-for-a-stateful-service-2d3b1da82642)  
+[Cache warming: Leveraging EBS for moving petabytes of data](https://netflixtechblog.medium.com/cache-warming-leveraging-ebs-for-moving-petabytes-of-data-adcf7a4a78c3)
