@@ -1,0 +1,104 @@
+---
+title: Husky
+date: 2022-04-19
+tags:
+ - husky
+ - ci/cd
+ - version control
+ - git
+ - github
+ - javascript
+ - bash
+ - lgtm
+ - dependabot
+---
+Git hooks are scripts that run automatically before or after certain Git events, such as committing or pushing changes to a repository.  
+Husky simplifies the management of these hooks, making it easier for developers to enforce coding standards, run tests, and automate other tasks as part of their development workflow.  
+Continuous integration and automated testing are essential for delivering high-quality web applications. Husky is often used to trigger test suites before pushing changes to a repository. This helps catch bugs early in the development process and ensures that new code doesn't break existing functionality.  
+You can create custom hooks to automate any task that can be scripted. For example, you could set up a hook to generate documentation, minify CSS and JavaScript, or even deploy your application to a staging server whenever you push changes.  
+Husky can be used to trigger code formatting and linting checks before a pull request is created. This ensures that the code submitted for review is clean and follows your project's guidelines, making code reviews smoother and more efficient.
+### Use case: Using Husky to scan for sensitive information:
+Husky can also be used to prevent developers from accidentally committing sensitive information, such as API keys, passwords, or private configuration files.
+
+1. **Install Husky and Lint-Staged:**
+
+   First, make sure you have Husky and Lint-Staged installed as project dependencies:
+
+   ```bash
+   npm install husky lint-staged --save-dev
+   ```
+
+2. **Configure Husky:**
+
+   In your project's `package.json` file, add a `husky` configuration section to specify the pre-commit hook:
+
+   ```json
+   "husky": {
+     "hooks": {
+       "pre-commit": "lint-staged"
+     }
+   }
+   ```
+
+3. **Configure Lint-Staged:**
+
+   Create a configuration file named `.lintstagedrc.json` in your project's root directory to define the tasks you want to run before committing. In this case, we'll use a custom script to scan for sensitive data:
+
+   ```json
+   {
+     "*.js": [
+       "check-sensitive-data"
+     ]
+   }
+   ```
+
+4. **Create a Custom Check Script:**
+
+   Now, create a custom script (e.g., `check-sensitive-data.js`) in your project's root directory to scan the staged files for sensitive data. Here's a simplified example using Node.js and regular expressions to search for a common pattern, such as "API_KEY":
+
+   ```javascript
+   const fs = require('fs');
+
+   // Define the sensitive data patterns you want to check for
+   const sensitivePatterns = [
+     /API_KEY/g,  // Example: API_KEY=your-secret-key
+     /PASSWORD/g  // Example: PASSWORD=your-password
+   ];
+
+   // Get the list of staged files from Lint-Staged
+   const stagedFiles = process.argv.slice(2);
+
+   // Iterate through staged files and check for sensitive data
+   stagedFiles.forEach((file) => {
+     const content = fs.readFileSync(file, 'utf-8');
+     for (const pattern of sensitivePatterns) {
+       if (pattern.test(content)) {
+         console.error(`Commit contains sensitive data in ${file}.`);
+         console.error('Please remove or obfuscate the sensitive information before committing.');
+         process.exit(1);
+       }
+     }
+   });
+   ```
+
+5. **Make the Check Script Executable:**
+
+   Ensure that your custom check script is executable by running:
+
+   ```bash
+   chmod +x check-sensitive-data.js
+   ```
+
+6. **Commit Your Changes:**
+
+   Now, when you try to commit changes to your repository, Husky will automatically run the pre-commit hook, which, in turn, will execute the `check-sensitive-data.js` script. If it detects any sensitive data patterns in the staged files, it will prevent the commit and display an error message.
+#### Can't I just use Dependabot?
+No, Husky and Dependabot are not the same tools, and they serve different purposes in the context of software development.
+#### Husky is a Git hook manager.
+   - **Purpose:** Its primary purpose is to manage Git hooks, which are scripts that run automatically before or after certain Git events, such as committing, pushing, merging, etc.
+   - **Use Cases:** Developers use Husky to automate tasks like code linting, running tests, ensuring coding standards, and other custom scripts as part of their Git workflow. It helps maintain code quality and consistency within a project.
+
+#### Dependabot is a dependency management tool.
+   - **Purpose:** Its primary purpose is to help you keep your project's dependencies (libraries, packages, etc.) up to date. It scans your project's dependencies, checks for updates, and automatically creates pull requests to update them when new versions are available.
+   - **Use Cases:** Developers use Dependabot to ensure that their projects stay secure and up-to-date by automatically handling dependency updates, which can be critical for security vulnerabilities and keeping your project compatible with the latest versions of libraries and frameworks.
+
