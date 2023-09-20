@@ -1,0 +1,60 @@
+---
+title: npm vs yarn
+date: 2022-05-05
+tags:
+ - npm
+ - yarn
+ - dependencies
+ - bash
+ - node modules
+ - bash
+---
+### npm
+The go-to package manager for JavaScript for years - it comes bundled with Node.js, making it readily available to anyone using Node.js for their projects:
+
+**npm boasts a vast and well-maintained package registry**, making it easy to find and install packages for almost any task.
+
+**npm has a built-in task runner**, allowing you to define custom scripts in your `package.json` file. This simplifies common development tasks like testing, building, and deployment.
+
+**npm follows semantic versioning (SemVer) principles**, which helps ensure that your project's dependencies are updated in a predictable and manageable manner.
+
+npm is not without its shortcomings. One of the main issues developers face with npm is the lack of consistency in package installation times, especially in projects with many dependencies.  
+
+### Yarn
+Developed by Facebook in collaboration with other industry leaders to address some of the performance and security concerns associated with npm.  
+
+**Yarn generates a `yarn.lock` file that guarantees deterministic builds** - consistent and reproducible builds across different environments. This ensures that everyone working on your project is using the same dependency versions.
+
+**Yarn excels at parallelizing package installations**, which significantly reduces the time it takes to set up your project's dependencies, particularly in larger projects.
+
+**Yarn's offline mode** allows you to work without an internet connection once you've initially downloaded the packages. This can be a lifesaver when you're on a plane or in a location with unreliable internet access.
+
+**Yarn's workspaces** feature simplifies managing monorepos (repositories containing multiple projects) by enabling cross-dependency management.
+
+### npm or yarn?
+If you prioritize speed, predictability, and offline development, Yarn may be the better choice. However, if you value a vast package registry and built-in task running capabilities, npm might be more suitable.
+
+### Can I use both in the same project?
+Having both Yarn and npm in the same project is not recommended. While it is technically possible to have both package managers coexist in a single project, doing so can lead to confusion, conflicts, and potential issues. 
+##### Dependency Conflicts
+Yarn and npm may resolve and manage dependencies differently, potentially leading to inconsistencies or conflicts in your project. This can result in hard-to-debug issues, as different package managers might install different versions of the same package.
+
+##### Package Locking Conflicts
+Yarn generates a `yarn.lock` file to ensure deterministic dependency resolution, while npm uses a `package-lock.json` file for a similar purpose. Having both files in the same project can create conflicts and confusion about which one should take precedence.
+
+##### Build and Scripts Ambiguity
+If you have both package managers installed, running scripts and commands in your project can become ambiguous. For example, when you run `npm install`, which package manager should execute the installation?
+
+##### Maintenance Overhead & Team Confusion
+Maintaining two package managers in a project can be cumbersome and may require extra effort to ensure that both are kept up to date. This can introduce unnecessary complexity into your development workflow. Having both package managers can lead to confusion among team members, especially if some are more familiar with one tool than the other. Consistency in tooling is generally preferred to streamline collaboration.
+
+### Clean Migration
+If you find yourself in a situation where you need to switch from one package manager to another, it's best to perform a clean migration. You can follow these steps:
+
+1. **Choose One**: Decide which package manager you want to use for your project, either Yarn or npm.
+
+2. **Remove the Other**: Uninstall the package manager you no longer want to use from your project. You can do this by deleting its lock file (`yarn.lock` or `package-lock.json`) and the `node_modules` directory associated with it.
+
+3. **Update `package.json`**: Make any necessary updates to your project's `package.json` file to ensure it reflects the correct package manager.
+
+4. **Install Dependencies**: Run the chosen package manager's installation command (`yarn install` or `npm install`) to install or update your project's dependencies.
