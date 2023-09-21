@@ -1,0 +1,37 @@
+---
+title: Domain Driven Design & the Monolith Conundrum
+date: 2022-06-26
+tags:
+ - domain driven design
+ - monolith
+ - microservices
+---
+Monolithic applications, characterized by tightly coupled and interdependent components, often grow organically over time. While they may be straightforward to start with, they can quickly become unwieldy as features and functionality accumulate. 
+##### Scalability
+Monoliths can be difficult to scale horizontally, leading to performance bottlenecks and expensive hardware upgrades.
+
+##### Maintenance
+Making changes to a monolith is risky, as any modification can have unintended consequences throughout the application.
+
+##### Team Collaboration
+Large teams working on monoliths can step on each other's toes, leading to inefficiencies and communication breakdowns. Keeping up with the latest technologies and practices is difficult in monolithic environments, which can stifle innovation.
+
+## Solution by Domain Driven Design
+Domain-Driven Design is an architectural approach that focuses on modeling your software around the core business domains. By dividing the problem space into distinct bounded contexts, DDD encourages a structured, modular architecture that is both flexible and scalable. A few aspects to consider when refactoring a monolith:
+
+##### Identify Bounded Contexts
+Start by dissecting your monolith into logical, self-contained domains or bounded contexts. Each bounded context represents a specific area of your application's functionality.
+
+##### Ubiquitous Language
+Create a shared vocabulary, or "ubiquitous language," for each bounded context. This ensures that everyone involved in that domain speaks the same language, promoting clear communication and understanding.
+
+##### Aggregate Roots
+Within each bounded context, identify aggregate roots, which are the primary entry points for interacting with the domain. Aggregates encapsulate the business rules and ensure consistency.
+
+##### Decouple and Isolate
+Extract these aggregates and their associated business logic from the monolith, creating microservices or smaller components dedicated to each domain. This isolation reduces interdependencies and simplifies maintenance.
+
+##### API Contracts**
+Define well-documented API contracts for communication between microservices. This allows for loose coupling and flexibility in implementing and evolving each domain.  
+
+With DDD's modular approach, teams can work on individual domains independently, accelerating development cycles and fostering innovation. Microservices can be scaled gracefully and independently, improving system performance and resource utilization. You can allocate resources where they're needed most.
