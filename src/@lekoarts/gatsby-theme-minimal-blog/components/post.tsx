@@ -6,7 +6,8 @@ import Layout from "@lekoarts/gatsby-theme-minimal-blog/src/components/layout"
 import ItemTags from "@lekoarts/gatsby-theme-minimal-blog/src/components/item-tags"
 import Seo from "@lekoarts/gatsby-theme-minimal-blog/src/components/seo"
 import PostFooter from "./post-footer"
-
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
 export type MBPostProps = {
   post: {
     slug: string

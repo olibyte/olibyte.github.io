@@ -43,6 +43,10 @@ const config: GatsbyConfig = {
             url: `https://github.com/olibyte`
           },
           {
+            name: `Stack Overflow`,
+            url: `https://stackoverflow.com/users/22069436/oliver`
+          },
+          {
             name: `LinkedIn`,
             url: `https://linkedin.com/in/olivercbennett`,
           }
@@ -135,6 +139,20 @@ const config: GatsbyConfig = {
     {
       resolve: `gatsby-plugin-mdx-embed`
     },
+    {
+      resolve: `gatsby-transformer-remark`,
+      options: {
+      plugins: [
+        {
+          resolve: `gatsby-remark-katex`,
+          options: {
+            // Add any KaTeX options from https://github.com/KaTeX/KaTeX/blob/master/docs/options.md here
+            strict: `ignore`
+          }
+        }
+      ],
+    },
+  },
 
     // You can remove this plugin if you don't need it
     shouldAnalyseBundle && {
