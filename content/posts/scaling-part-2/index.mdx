@@ -1,0 +1,283 @@
+---
+title: Horizontal, Vertical & Autoscaling with CloudFormation & Kubernetes (Part 2)
+date: 2024-07-20
+tags:
+  - CloudFormation
+  - Kubernetes
+  - IaC
+  - EC2
+  - AWS
+  - Load Balancing
+  - Microservices
+  - Prometheus
+  - Grafana
+---
+### Scenario: Enhancing a Learning Management System (LMS) Deployment
+
+#### Context:
+As the root admin for `lms.educationapps.vic.gov.au`, I'm responsible for ensuring the system is scalable, resilient, and performs efficiently under varying loads. This LMS is critical for delivering online education content to thousands of learners and instructors.
+
+### Horizontal Scaling with AWS Auto Scaling
+
+**Challenge:**
+During peak usage times, such as the start of a new school term or during major online assessments, the LMS experiences significant spikes in traffic. The goal is to ensure the LMS can handle these spikes without performance degradation.
+
+**Solution:**
+I implemented AWS Auto Scaling to dynamically adjust the number of EC2 instances based on traffic load, ensuring consistent performance.
+
+**How I did it:**
+1. **Created an Auto Scaling Group:** Configured an Auto Scaling Group (ASG) with a Launch Configuration specifying the AMI, instance type, and security groups. Set the minimum, maximum, and desired number of instances based on expected traffic patterns.
+2. **Configured Scaling Policies:** Implemented target tracking scaling policies based on CPU utilization. This ensures that new instances are automatically launched when the CPU utilization of existing instances exceeds 70%, and instances are terminated when the utilization drops below 30%.
+3. **Integrated Load Balancer:** Deployed an Elastic Load Balancer (ELB) to distribute incoming traffic across multiple EC2 instances in the ASG, ensuring even load distribution and high availability.
+4. **Continuous Monitoring:** Used Amazon CloudWatch to monitor metrics and set alarms to trigger scaling activities, ensuring that the system automatically adjusts to changing traffic conditions.
+
+**Outcome:**
+The LMS maintained high performance and availability during peak times, with the system automatically scaling out to handle increased traffic and scaling in during off-peak times to optimize costs.
+
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation Template for Horizontal Scaling with Auto Scaling Group"
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t3.medium
+    Description: EC2 instance type
+
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC for the Auto Scaling Group
+
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs for the Auto Scaling Group
+
+Resources:
+  LaunchConfiguration: # Specifies the AMI, instance type, and security group for EC2 instances.
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-0c55b159cbfafe1f0  # Replace with a valid AMI ID in your region
+      InstanceType: !Ref InstanceType
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          # Install and start the LMS application
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+
+  AutoScalingGroup: # Manages the scaling of instances based on load, with a minimum size of 1, a maximum size of 5, and a desired capacity of 2.
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier: !Ref SubnetIds
+      LaunchConfigurationName: !Ref LaunchConfiguration
+      MinSize: 1
+      MaxSize: 5
+      DesiredCapacity: 2
+      TargetGroupARNs:
+        - !Ref TargetGroup
+      MetricsCollection:
+        - Granularity: "1Minute"
+      HealthCheckType: "EC2"
+      HealthCheckGracePeriod: 300
+
+  ScaleUpPolicy: # Defines target tracking policies to scale up based on CPU utilization.
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: "TargetTrackingScaling"
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 50.0
+
+  ScaleDownPolicy: # Defines target tracking policies to scale down based on CPU utilization.
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: "TargetTrackingScaling"
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 30.0
+
+  InstanceSecurityGroup: #Allows HTTP access to the instances.
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Enable HTTP access"
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  TargetGroup: # Used by the load balancer to route traffic to the instances.
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref VPC
+      Port: 80
+      Protocol: HTTP
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "80"
+      HealthCheckPath: "/"
+      Matcher:
+        HttpCode: "200"
+      TargetType: instance
+
+Outputs:
+  AutoScalingGroupName:
+    Description: "Auto Scaling Group Name"
+    Value: !Ref AutoScalingGroup
+```
+
+### Vertical Scaling with Kubernetes on AWS
+
+**Challenge:**
+Certain compute-intensive operations within the LMS, such as video processing or large-scale data analysis, required more resources than initially provisioned. The goal was to ensure these operations could be performed efficiently without over-provisioning resources during regular usage.
+
+**Solution:**
+I leveraged Kubernetes to manage containerized applications, allowing for vertical scaling of specific pods to handle resource-intensive tasks.
+
+**How I did it:**
+1. **Deployed Kubernetes Cluster:** Set up a Kubernetes cluster on AWS using Amazon EKS (Elastic Kubernetes Service). Deployed the LMS application as a set of microservices within the cluster.
+2. **Implemented Vertical Pod Autoscaler (VPA):** Configured the Vertical Pod Autoscaler to automatically adjust the CPU and memory requests and limits for specific pods based on their observed usage. This ensured that resource-intensive tasks received the necessary resources while maintaining efficient resource utilization during normal operations.
+3. **Utilized Horizontal Pod Autoscaler (HPA):** In addition to VPA, used the Horizontal Pod Autoscaler to scale the number of pods based on traffic load. This provided a dual-layered approach to scaling, handling both high traffic and resource-intensive operations.
+4. **Monitoring and Optimization:** Implemented monitoring using Prometheus and Grafana to track resource usage and performance metrics. Continuously optimized resource requests and limits based on real-time data.
+
+**Outcome:**
+The LMS efficiently handled compute-intensive operations by vertically scaling specific pods, while also maintaining the ability to horizontally scale the entire application during high traffic periods. This dual-scaling approach ensured optimal performance and resource utilization. By leveraging AWS Auto Scaling for horizontal scaling and Kubernetes for both horizontal and vertical scaling, I ensured that the LMS was capable of handling varying loads and resource-intensive tasks efficiently. These implementations improved the system's scalability, resilience, and performance, contributing to a better user experience for students and teachers relying on the LMS.
+
+#### Steps:
+1. Create an EKS cluster using CloudFormation.
+2. Use Kubernetes manifests to configure Vertical Pod Autoscaler (VPA) for specific pods.
+
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation Template for EKS Cluster"
+
+Parameters:
+  ClusterName:
+    Type: String
+    Default: "eks-cluster"
+    Description: "The name of the EKS cluster"
+
+  NodeInstanceType:
+    Type: String
+    Default: t3.medium
+    Description: "EC2 instance type for the EKS worker nodes"
+
+  NodeGroupSize:
+    Type: Number
+    Default: 2
+    Description: "The desired number of worker nodes"
+
+Resources:
+  EKSCluster: #Creates an EKS cluster with worker nodes.
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Ref ClusterName
+      ResourcesVpcConfig:
+        SubnetIds: 
+          - subnet-12345678  # Replace with your Subnet IDs
+          - subnet-87654321  # Replace with your Subnet IDs
+        SecurityGroupIds: 
+          - !Ref NodeSecurityGroup
+
+  NodeGroup: #Manages the worker nodes using an Auto Scaling Group.
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      DesiredCapacity: !Ref NodeGroupSize
+      MinSize: 1
+      MaxSize: 4
+      VPCZoneIdentifier: 
+        - subnet-12345678  # Replace with your Subnet IDs
+        - subnet-87654321  # Replace with your Subnet IDs
+      LaunchConfigurationName: !Ref NodeLaunchConfig
+      TargetGroupARNs:
+        - !Ref TargetGroup
+
+  NodeLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      InstanceType: !Ref NodeInstanceType
+      ImageId: ami-0c55b159cbfafe1f0  # Replace with a valid EKS optimized AMI ID
+      SecurityGroups:
+        - !Ref NodeSecurityGroup
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          /etc/eks/bootstrap.sh eks-cluster
+
+  NodeSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "EKS worker nodes security group"
+      VpcId: vpc-12345678  # Replace with your VPC ID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          SourceSecurityGroupId: !Ref ControlPlaneSecurityGroup
+
+  ControlPlaneSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "EKS control plane security group"
+      VpcId: vpc-12345678  # Replace with your VPC ID
+
+Outputs:
+  ClusterName:
+    Description: "EKS Cluster Name"
+    Value: !Ref ClusterName
+  NodeInstanceType:
+    Description: "EKS Node Instance Type"
+    Value: !Ref NodeInstanceType
+  NodeGroupSize:
+    Description: "EKS Node Group Size"
+    Value: !Ref NodeGroupSize
+```
+
+### Kubernetes Manifest for Vertical Pod Autoscaler (VPA):
+
+```yaml
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler # Configures VPA to automatically adjust the CPU and memory requests and limits for the LMS deployment based on observed usage.
+metadata:
+  name: lms-vpa
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind:       Deployment
+    name:       lms-deployment
+  updatePolicy:
+    updateMode: "Auto"
+---
+apiVersion: apps/v1
+kind: Deployment # Defines the LMS application deployment with initial resource requests and limits, which can be adjusted by VPA.
+metadata:
+  name: lms-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lms
+  template:
+    metadata:
+      labels:
+        app: lms
+    spec:
+      containers:
+      - name: lms-container
+        image: my-lms-image:latest  # Replace with your LMS image
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+```

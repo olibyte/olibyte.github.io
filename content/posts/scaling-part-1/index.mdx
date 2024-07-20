@@ -1,0 +1,217 @@
+---
+title: Horizontal, Vertical & Autoscaling with CloudFormation & Kubernetes (Part 1)
+date: 2024-07-20
+tags:
+  - CloudFormation
+  - Kubernetes
+  - IaC
+  - EC2
+  - AWS
+  - Load Balancing
+  - Microservices
+  - Prometheus
+  - Grafana
+---
+Horizontal scaling and vertical scaling are two different strategies used to increase the capacity and performance of a system.
+
+### Horizontal Scaling (Scale Out)
+
+Horizontal scaling involves adding more instances of a system or components, such as servers, to a distributed network. This approach is often referred to as "scaling out."
+
+**How does it work?**
+- **Add More Machines:** Increase capacity by adding more servers or nodes to the existing system.
+- **Distributed Load:** The workload is distributed across multiple servers or instances.
+- **Load Balancing:** Load balancers are typically used to distribute traffic evenly among the instances.
+
+**Pros:**
+- **Fault Tolerance:** Improves fault tolerance because if one server fails, others can take over the load.
+- **Cost-Effective:** Can be more cost-effective since you can use commodity hardware.
+- **Scalability:** Easier to scale infinitely by adding more machines.
+- **Flexibility:** Allows for incremental upgrades and expansions.
+
+**Cons:**
+- **Complexity:** Can add complexity to the system in terms of configuration and management.
+- **Data Consistency:** Maintaining data consistency and state synchronization across multiple nodes can be challenging.
+- **Network Latency:** May introduce network latency as data needs to be communicated between different servers.
+
+**Use Cases:**
+- Web applications with varying and unpredictable traffic patterns.
+- Distributed databases and microservices architectures.
+- Systems that require high availability and fault tolerance.
+
+### Vertical Scaling (Scale Up)
+
+Vertical scaling involves adding more power (CPU, RAM, disk space) to an existing server or system. This approach is often referred to as "scaling up."
+
+**How does it work?**
+- **Increase Resources:** Enhance the capacity of the existing server by upgrading its hardware components.
+- **Single Instance:** The system continues to run on a single server or a limited number of servers, each with higher capacity.
+
+**Pros:**
+- **Simplicity:** Easier to implement and manage since you are only upgrading existing hardware.
+- **Consistency:** No need to handle distributed data or load balancing, maintaining a consistent state is simpler.
+- **Lower Latency:** Reduced network latency as all operations are handled within a single machine.
+
+**Cons:**
+- **Downtime:** Typically requires downtime to upgrade hardware components.
+- **Limitations:** There is a physical limit to how much you can upgrade a single machine.
+- **Cost:** Can be more expensive due to the cost of high-end hardware.
+
+**Use Cases:**
+- Applications with steady and predictable workloads.
+- Systems that require high performance from a single instance, such as databases or enterprise applications.
+- Environments where simplicity and ease of management are prioritized over fault tolerance.
+
+### Horizontal Scaling: AWS Auto Scaling Group
+
+This CloudFormation template creates an Auto Scaling Group (ASG) that horizontally scales EC2 instances based on the CPU utilization.
+
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation Template for Horizontal Scaling with Auto Scaling Group"
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: EC2 instance type
+
+Resources:
+  # Define the Launch Configuration. Specifies the AMI ID and instance type for instances in the Auto Scaling Group.
+  LaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: ami-0c55b159cbfafe1f0  # Replace with a valid AMI ID in your region
+      InstanceType: !Ref InstanceType
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+
+  # Define the Auto Scaling Group. Manages a group of instances, adjusting the number of instances based on demand. It is set with a minimum size of 1, a maximum size of 5, and a desired capacity of 2.
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: !Ref LaunchConfig
+      MinSize: 1
+      MaxSize: 5
+      DesiredCapacity: 2
+      VPCZoneIdentifier:
+        - subnet-12345678  # Replace with your subnet ID
+      TargetGroupARNs:
+        - !Ref TargetGroup
+      MetricsCollection:
+        - Granularity: "1Minute"
+      HealthCheckType: "EC2"
+      HealthCheckGracePeriod: 300
+
+  # Define the Scaling Policy. Uses target tracking scaling to adjust the number of instances based on average CPU utilization.
+  ScaleUpPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: "TargetTrackingScaling"
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 50.0
+
+  # Define the Security Group. Allows SSH access to the instances.
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Enable SSH access"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+  # Define the Target Group for the Load Balancer. Used by the load balancer to route traffic to the instances.
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: vpc-12345678  # Replace with your VPC ID
+      Port: 80
+      Protocol: HTTP
+      HealthCheckProtocol: HTTP
+      HealthCheckPort: "80"
+      HealthCheckPath: "/"
+      Matcher:
+        HttpCode: "200"
+      TargetType: instance
+
+Outputs:
+  AutoScalingGroupName:
+    Description: "Auto Scaling Group Name"
+    Value: !Ref AutoScalingGroup
+```
+
+### Vertical Scaling: Modify EC2 Instance Type
+
+This CloudFormation template creates a single EC2 instance and demonstrates vertical scaling by modifying the instance type.
+
+```yaml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS CloudFormation Template for Vertical Scaling by Modifying EC2 Instance Type"
+# Instance type parameter. Allows changing the instance type to scale vertically by selecting different instance sizes (e.g., t2.micro, t2.small, t3.medium).
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues: [t2.micro, t2.small, t2.medium, t2.large, t3.micro, t3.small, t3.medium, t3.large]
+    Description: EC2 instance type
+
+Resources:
+  # Define the EC2 Instance. Creates a single EC2 instance with a specified instance type.
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      ImageId: ami-0c55b159cbfafe1f0  # Replace with a valid AMI ID in your region
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+
+  # Define the Security Group. Allows SSH access to the instance.
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: "Enable SSH access"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+
+Outputs:
+  InstanceId:
+    Description: "EC2 Instance ID"
+    Value: !Ref EC2Instance
+  InstanceType:
+    Description: "EC2 Instance Type"
+    Value: !Ref InstanceType
+```
+
+### AWS Auto Scaling
+
+**AWS Auto Scaling** primarily facilitates horizontal scaling by automatically adjusting the number of Amazon EC2 instances in an Auto Scaling group. It can add or remove instances based on the current demand, ensuring that you have the right amount of compute capacity to handle your application's load.
+**When combined with Elastic Load Balancing (ELB)**, AWS Auto Scaling distributes incoming application traffic across multiple instances, ensuring high availability and reliability.
+
+AWS allows you to change **EC2 Instance Types** to add more CPU, memory, or storage. This form of vertical scaling can be manually adjusted based on performance metrics.
+**ELB can also support vertical scaling** by redirecting traffic to instances that have been manually scaled up to larger instance types.
+
+### Kubernetes
+
+**Kubernetes facilitates horizontal scaling through the Horizontal Pod Autoscaler (HPA)**, which automatically scales the number of pods in a deployment or replica set based on observed CPU utilization or other custom metrics. HPA ensures that your application can handle varying loads by adding or removing pods as needed.
+The **Cluster Autoscaler** component can adjust the number of nodes in a Kubernetes cluster based on the resource requests of the pods. If pods cannot be scheduled due to insufficient resources, the cluster autoscaler will add more nodes to the cluster.
+
+**Kubernetes supports vertical scaling through the Vertical Pod Autoscaler (VPA)**, which automatically adjusts the CPU and memory requests and limits for containers running in pods. VPA can recommend or automatically apply changes to the resource requests based on historical data and current usage patterns.
+Kubernetes can manage the scaling of pods and resources within pods, the actual **nodes can be upgraded (scaled vertically) by changing the underlying VM or hardware specifications**. This is typically **managed by the cloud provider (e.g., resizing the VM in GKE, AKS, or EKS)**.
+
+### Comparison and Use Cases
+
+**AWS Auto Scaling** provides horizontal scaling for EC2 instances, ensuring that your application can handle varying loads by adjusting the number of instances. Vertical scaling is also possible by resizing instances manually.
+- **Use Case:** Ideal for automatically scaling EC2 instances based on demand. It's best suited for applications deployed on EC2 where you need to ensure that there is enough compute capacity to handle traffic spikes.
+- **Scaling Method:** Primarily horizontal scaling with some support for manual vertical scaling.
+
+**Kubernetes** offers robust support for both horizontal and vertical scaling. Horizontal Pod Autoscaler and Cluster Autoscaler handle horizontal scaling, while Vertical Pod Autoscaler manages vertical scaling. Kubernetes provides a flexible and powerful platform for scaling containerized applications.
+- **Use Case:** Ideal for containerized applications where you need fine-grained control over the scaling of individual components (pods). Kubernetes excels in microservices architectures and large-scale applications requiring dynamic scaling and orchestration.
+- **Scaling Method:** Supports both horizontal and vertical scaling of pods and nodes, providing a comprehensive solution for managing resource allocation and application performance.
